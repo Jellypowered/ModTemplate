@@ -7,3 +7,5 @@
 # /Source
 /.vs/ModTemplate
 /.vs/*
+PrepareNewMod.exe
+settings.json
