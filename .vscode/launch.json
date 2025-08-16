@@ -11,7 +11,7 @@
             "request": "launch",
             "preLaunchTask": "BuildWindowsDLL",
             "args": [],
-            "program": "../../RimWorldWin64.exe",
+            "program": "F:/SteamLibrary/steamapps/common/RimWorld/RimWorldWin64.exe",
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "internalConsoleOptions":"neverOpen",
