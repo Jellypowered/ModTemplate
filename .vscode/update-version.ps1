@@ -7,6 +7,27 @@ param(
 $versionFile = "version.txt"
 $versionCs = "Source\VersionInfo.cs"
 
+function Resolve-BuildNamespace {
+    $projectDir = ".vscode"
+    $candidates = Get-ChildItem -Path $projectDir -Filter "*.csproj" -File -ErrorAction SilentlyContinue
+    if (-not $candidates -or $candidates.Count -eq 0) {
+        return "Template"
+    }
+
+    try {
+        [xml]$proj = Get-Content -Path $candidates[0].FullName -Raw
+        $rootNsNode = $proj.SelectSingleNode('/Project/PropertyGroup/RootNamespace')
+        if ($rootNsNode -and -not [string]::IsNullOrWhiteSpace($rootNsNode.InnerText)) {
+            return $rootNsNode.InnerText.Trim()
+        }
+    }
+    catch {
+        # Fall through to default namespace if project parsing fails.
+    }
+
+    return "Template"
+}
+
 # Read current version
 $ver = [decimal](Get-Content $versionFile -Raw).Trim()
 
@@ -22,6 +43,7 @@ if (-not $SkipIncrement) {
 $buildType = if ($Config -eq 'Debug') {'D'} else {'R'}
 $versionString = "$ver($buildType)"
 $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+$buildNamespace = Resolve-BuildNamespace
 
 # Generate VersionInfo.cs
 $cs = @"
@@ -29,7 +51,7 @@ $cs = @"
 // Build timestamp: $timestamp
 // Build configuration: $Config
 
-namespace SurvivalTools
+namespace $buildNamespace
 {
     public static class BuildVersion
     {
